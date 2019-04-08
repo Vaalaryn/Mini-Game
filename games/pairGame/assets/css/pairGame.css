@@ -1,0 +1,74 @@
+/* style */
+
+.pairGameContainer td
+{
+    width: 50px;
+    height: 70px;
+    padding: 5px 2px 5px 2px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.pairGameContainer td:hover
+{
+    cursor: pointer;
+}
+
+/* Classes des cartes */
+.js
+{
+    background-image: url(../image/js.png);
+}
+.cs
+{
+    background-image: url(../image/cs.png);
+}
+.c
+{
+    background-image: url(../image/c++.png);
+}
+.css
+{
+    background-image: url(../image/css.png);
+}
+.java
+{
+    background-image: url(../image/java.png);
+}
+.node
+{
+    background-image: url(../image/node.png);
+}
+.angular
+{
+    background-image: url(../image/angular.png);
+}
+.html
+{
+    background-image: url(../image/html.png);
+}
+.swift
+{
+    background-image: url(../image/swift.png);
+}
+.php
+{
+    background-image: url(../image/php.png);
+}
+.python
+{
+    background-image: url(../image/python.png);
+}
+.react
+{
+    background-image: url(../image/react.png);
+}
+
+
+
+
+
+.verso {
+    background-image: url(../image/cardV.png);
+}
