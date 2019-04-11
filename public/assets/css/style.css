@@ -1,7 +1,15 @@
-body {
+html,body {
     height: 100vh;
     max-height: 100vh;
     overflow: hidden;
+}
+.container-fluid
+{
+    height: 100%;
+}
+.wrapper
+{
+    height: 100%;
 }
 
 #chat {
@@ -9,14 +17,31 @@ body {
     flex-direction: column;
     justify-content: flex-end;
 
+    height: 95vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+
+
+}
+
+nav
+{
+    height: 5vh;
+
 }
 
 .chatArea {
-    height: 81vh;
+    overflow-y: scroll;
+    height: 100%;
+
 }
 #messages
 {
+    flex: auto;
+    height: 100%;
     padding-left: 10px;
+    word-wrap: break-word;
 }
 .message,.newuser,.WhispMessage
 {
@@ -40,13 +65,23 @@ body {
     width: 95%;
     bottom: 0;
     border-radius: 0;
+
+
+}
+.input_msg
+{
+
 }
 
-
+.form-control
+{
+    border-radius: 0;
+}
 .form-control:focus, .form-control:active:focus{
     outline:none;
     box-shadow:none;
     border: 1px solid black;
+
 }
 
 
