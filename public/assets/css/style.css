@@ -68,6 +68,31 @@ nav
 
 
 }
+.bg-purple
+{
+    background-color: purple;
+}
+.text-purple
+{
+   color: purple;
+}
+.text-center
+{
+    text-align: center;
+}
+.text{
+    position: absolute;
+    right:  55px;
+    bottom: 5px;
+    color: #00ff1a;
+}
+.align-center
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .input_msg
 {
 
@@ -83,7 +108,11 @@ nav
     border: 1px solid black;
 
 }
-
+.userLogo
+{
+    color: white;
+    font-size: 1.4em;
+}
 
 .WhispMessage
 {
