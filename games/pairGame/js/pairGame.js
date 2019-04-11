@@ -4,11 +4,11 @@ const NORMAL = 2;
 const DIFFICILE = 3;
 
 /* Variables globales */
-let game = setDifficulty(FACILE); //Options de la partie
+let game = setDifficulty(DIFFICILE); //Options de la partie
 
 
 /* Tableaux globaux */
-let cardList = ["jquery", "angular", "c", "cs", "java", "node", "react", "html", "css", "python", "php", "swift"];
+let cardList = ["js", "angular", "c", "cs", "java", "node", "react", "html", "css", "python", "php", "swift"];
 let listeLogo;
 let indexCardClass = [];
 let currentListeLogo = [];
@@ -35,28 +35,28 @@ function setDifficulty(difficulte) {
             break;
         }
     }
-
-
     return {
         difficulty: difficulte,
         nbLignes: nbLignes,
         nbCols: nbCols,
         nbCartes: nbLignes * nbCols
     };
-
 }
 
+/**
+ * Coupe le tableau en longueur adapté à la difficulté
+ * @returns {string[]}
+ */
 function sliceList() {
     let nbLogos = (game.nbLignes * game.nbCols) / 2;
 
     return cardList.slice(0, nbLogos);
 }
 
-
-function setClass(elem) {
-
-}
-
+/**
+ * Retourne la carte cliquée
+ * @param elem
+ */
 function flipCard(elem) {
     elem = $(elem);
     let x = elem.index();
@@ -69,7 +69,12 @@ function flipCard(elem) {
     }
 }
 
-
+/**
+ * Compte le nombre de chaine de caractère égale à search et retourne le nombre compté
+ * @param tab
+ * @param search
+ * @returns {number}
+ */
 function countOccurences(tab,search) {
     let nb = 0;
     tab.forEach(function (elem) {
@@ -83,10 +88,14 @@ function countOccurences(tab,search) {
     return nb;
 }
 
-function setCardClass(x, y) {
+/**
+ * Gère les classes d'affichage des cartes, et fait en sorte que les classes soient assignées par paire
+ * @returns {*}
+ */
+function setCardClass() {
     let name;
     do {
-         name = listeLogo[Math.floor(Math.random() * listeLogo.length)];
+        name = listeLogo[Math.floor(Math.random() * listeLogo.length)];
     }
     while (countOccurences(currentListeLogo,name) > 1);
 
@@ -94,18 +103,27 @@ function setCardClass(x, y) {
     return name;
 }
 
-
+/**
+ * Retourne toutes les cartes sur le verso
+ */
 function unflipAllCard() {
     $('.unflip').attr('class','verso');
     $('td').css('pointer-events', 'auto');
 }
+
+/**
+ * Supprime les cartes trouvées
+ */
 function delCartes() {
     $('.unflip').attr('class','hide');
     $('td').css('pointer-events', 'auto');
 
 }
 
-
+/**
+ * Vérifie qu'une paire a été trouvée
+ * @param name
+ */
 function verifDouble(name) {
     let compt = 0;
     $('.unflip').each(function () {
@@ -128,6 +146,10 @@ function verifDouble(name) {
         setTimeout(unflipAllCard,500);
     }
 }
+
+/**
+ * Vérifie que la partie est gagnée
+ */
 function verifWin() {
     if (game.nbCartes === 0)
     {
@@ -136,6 +158,9 @@ function verifWin() {
 
 }
 
+/**
+ * Construit la grille de carte
+ */
 function construireTable() {
     listeLogo = sliceList();
     let container = $('.pairGameContainer');
@@ -148,7 +173,7 @@ function construireTable() {
             let gameCase = $('<td></td>');
             gameCase.addClass('verso');
 
-            indexCardClass[y][x] = setCardClass(x, y);
+            indexCardClass[y][x] = setCardClass();
 
 
             gameCase.bind('click',function f() {
