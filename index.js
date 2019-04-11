@@ -15,6 +15,7 @@ const io = require('socket.io')(server);
 
 const port = process.env.PORT || 80;
 let sessionUsers = [];
+let numUsers = 0;
 
 passport.use(new LocalStrategy(
     {usernameField: 'username'},
@@ -68,7 +69,11 @@ app.set('view engine', 'ejs');
 
 //Routing
 app.get('/', (req, res) => {
-    res.render("inscription", {notErrorMessage: "", errorMessage: ""});
+    if (req.session.passport === undefined) {
+        res.render("inscription", {notErrorMessage: "", errorMessage: ""});
+    } else {
+        res.redirect('/chat');
+    }
 });
 
 app.post('/', (req, res) => {
@@ -85,21 +90,25 @@ app.post('/', (req, res) => {
                             password: hash,
                             xp: 0
                         });
-                        res.render('inscription',{notErrorMessage: 'inscription reussi', errorMessage: "",});
+                        res.render('inscription', {notErrorMessage: 'inscription reussi', errorMessage: "",});
                     } else {
-                        res.render('inscription',{notErrorMessage: "", errorMessage: 'mot de passe est différent'});
+                        res.render('inscription', {notErrorMessage: "", errorMessage: 'mot de passe est différent'});
                     }
                 } else {
-                    res.render('inscription',{notErrorMessage: "", errorMessage: 'ce pseudo est déjà pris'});
+                    res.render('inscription', {notErrorMessage: "", errorMessage: 'ce pseudo est déjà pris'});
                 }
             });
     } else {
-        res.render('inscription',{notErrorMessage: "", errorMessage: 'il y a des champs vide'});
+        res.render('inscription', {notErrorMessage: "", errorMessage: 'il y a des champs vide'});
     }
 });
 
 app.get('/login', (req, res) => {
-    res.render("login");
+    if (req.session.passport === undefined) {
+        res.render("login");
+    } else {
+        res.redirect('/chat');
+    }
 });
 
 app.post('/login', (req, res, next) => {
@@ -111,7 +120,7 @@ app.post('/login', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.render('/login',{msg: "mauvais username"});
+            return res.render('/login', {msg: "mauvais username"});
         }
         req.login(user, (err) => {
             if (err) {
@@ -135,10 +144,10 @@ app.get('/chat', (req, res) => {
                         }
                     }
                 )
-        }else {
+        } else {
             res.redirect('/login');
         }
-    }else {
+    } else {
         res.redirect('/login');
     }
 });
@@ -153,17 +162,37 @@ server.listen(port, () => {
 });
 
 io.on('connection', (socket) => {
-   socket.on('login', (user) => {
-       sessionUsers[user]=socket.id;
-       io.emit('new user', user);
-   });
+    let addedUser = false;
 
-   socket.on('message sent', (data) => {
-       io.emit('new message', data);
-   });
+    socket.on('login', (user) => {
+        socket.username = user;
+        sessionUsers[user] = socket.id;
+        if (addedUser) return;
+        numUsers++;
+        addedUser = true;
+        socket.emit('login', {
+            numUsers: numUsers
+        });
+        io.emit('new user', {user: user, numUsers: numUsers});
+    });
 
-   socket.on('private sent', (data) => {
-       io.to(sessionUsers[data.to]).emit('new private', data);
-       socket.emit('new private', data);
-   });
+    socket.on('message sent', (data) => {
+        io.emit('new message', data);
+    });
+
+    socket.on('private sent', (data) => {
+        io.to(sessionUsers[data.to]).emit('new private', data);
+        socket.emit('new private', data);
+    });
+
+    socket.on('disconnect', () => {
+        if (addedUser) {
+            numUsers--;
+            // echo globally that this client has left
+            socket.broadcast.emit('user left', {
+                username: socket.username,
+                numUsers: numUsers
+            });
+        }
+    });
 });

@@ -1,6 +1,13 @@
 $(() => {
     let socket = io();
     socket.emit('login', username);
+    function loadGame(gameName){
+        socket.emit('choose page', {page: gameName});
+    }
+
+    socket.on('load page', () => {
+        
+    });
 
     $('#inputMessage').keyup( (e) => {
         if (e.which == 13) {
@@ -21,8 +28,9 @@ $(() => {
         }
     });
 
-    socket.on('new user', (user) => {
-        $('#messages').append('<li class="newuser">' + user + " s'est connecté</li>")
+    socket.on('new user', (data) => {
+        $('#messages').append('<li class="newuser">' + data.user + " s'est connecté</li>");
+        $('#pplOnline').text(data.numUsers);
     });
 
     socket.on('new message', (data) => {
@@ -30,6 +38,11 @@ $(() => {
     });
 
     socket.on('new private', (data) => {
-        $('#messages').append('<li class="WhispMessage"><em class="whispUsername">' + data.user + ' <i class="fas fa-arrow-right"></i> ' + data.to +' : </em><span class="messageContent">' + data.message + '</span></li>');
+        $('#messages').append('<li class="WhispMessage"><em class="whispUsername">' + data.user + '<i class="fas fa-arrow-right"></i> ' + data.to +' : </em><span class="messageContent">' + data.message + '</span></li>');
+    });
+
+    socket.on('user left', (data) => {
+        $('#messages').append('<li class="newuser">' + data.username + " s'est déconnecté</li>");
+        $('#pplOnline').text(data.numUsers);
     });
 });
