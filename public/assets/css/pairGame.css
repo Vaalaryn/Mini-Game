@@ -1,0 +1,96 @@
+/* style */
+
+.pairGameContainer td
+{
+    width: 50px;
+    height: 100px;
+    padding: 5px 2px 5px 2px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
+
+.pairGameContainer table {
+    height: 90vh;
+    width: 100%;
+}
+
+.pairGameContainer
+{
+    border: 1px solid black;
+    display: inline-block;
+    height: 95vh;
+    width: 100%;
+}
+.bar_menu
+{
+    border: 1px solid black;
+    margin : -1px -1px 0 0px;
+    height: 30px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.pairGameContainer td:hover
+{
+    cursor: pointer;
+}
+
+/* Classes des cartes */
+.js
+{
+    background-image: url(../../assets/img/js.png);
+}
+.cs
+{
+    background-image: url(../../assets/img/cs.png);
+}
+.c
+{
+    background-image: url(../../assets/img/c++.png);
+}
+.css
+{
+    background-image: url(../../assets/img/css.png);
+}
+.java
+{
+    background-image: url(../../assets/img/java.png);
+}
+.node
+{
+    background-image: url(../../assets/img/node.png);
+}
+.angular
+{
+    background-image: url(../../assets/img/angular.png);
+}
+.html
+{
+    background-image: url(../../assets/img/html.png);
+}
+.swift
+{
+    background-image: url(../../assets/img/swift.png);
+}
+.php
+{
+    background-image: url(../../assets/img/php.png);
+}
+.python
+{
+    background-image: url(../../assets/img/python.png);
+}
+.react
+{
+    background-image: url(../../assets/img/react.png);
+}
+
+
+
+
+
+.verso {
+    background-image: url("../../assets/img/cardV.png");
+}

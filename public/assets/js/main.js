@@ -9,6 +9,7 @@ $(() => {
 
     socket.on('load page', (gamePage) => {
         document.getElementById('game').innerHTML = gamePage;
+        startMemo();
     });
 
     $('#inputMessage').keyup( (e) => {
