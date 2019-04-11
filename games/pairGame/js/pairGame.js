@@ -5,6 +5,10 @@ const DIFFICILE = 3;
 
 /* Variables globales */
 let game = setDifficulty(DIFFICILE); //Options de la partie
+let chrono = {
+    second : 0,
+    minute : 0
+}
 
 
 /* Tableaux globaux */
@@ -39,8 +43,29 @@ function setDifficulty(difficulte) {
         difficulty: difficulte,
         nbLignes: nbLignes,
         nbCols: nbCols,
-        nbCartes: nbLignes * nbCols
+        nbCartes: nbLignes * nbCols,
+        xp: 0,
+        nbSecondes : 0
     };
+}
+function incChrono() {
+    if (chrono.second === 60)
+    {
+        chrono.second = 0;
+        chrono.minute += 1;
+        game.nbSecondes += 1;
+    }
+    else
+    {
+        chrono.second += 1;
+        game.nbSecondes += 1;
+    }
+
+
+
+
+    $('#chrono').text( chrono.minute + ' : ' + chrono.second );
+
 }
 
 /**
@@ -67,6 +92,12 @@ function flipCard(elem) {
         elem.addClass(indexCardClass[y][x]);
         elem.addClass('unflip');
     }
+}
+
+function setMenu(options) {
+    $('.bar_menu').append('<em id="cartes">Cartes : '+ game.nbCartes +'</em>');
+    $('.bar_menu').append('<em id="chrono">'+ chrono.minute + ' : ' + chrono.second +'</em>')
+    $('.bar_menu').append('<em id="xp">xp : '+ game.xp +'</em>');
 }
 
 /**
@@ -118,8 +149,22 @@ function delCartes() {
     $('.unflip').attr('class','hide');
     $('td').css('pointer-events', 'auto');
 
+    $('#cartes').text('Cartes : '+ game.nbCartes);
+    console.log(game.nbSecondes);
+
+    if (game.nbSecondes < 30)
+        game.xp += parseInt(5 * (game.difficulty/2));
+    if (game.nbSecondes >= 30 && game.nbSecondes < 90  )
+        game.xp += parseInt(2 * (game.difficulty/2));
+    if (game.nbSecondes >= 90)
+        game.xp += parseInt(1 * (game.difficulty/2));
+
+    refreshXp();
 }
 
+function refreshXp() {
+    $('#xp').text('xp : ' + game.xp);
+}
 /**
  * Vérifie qu'une paire a été trouvée
  * @param name
@@ -195,4 +240,6 @@ function construireTable() {
  */
 $(function () {
     construireTable();
+    setMenu(game);
+    setInterval(incChrono,1000,);
 });

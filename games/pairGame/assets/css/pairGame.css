@@ -8,6 +8,22 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+
+}
+.pairGameContainer
+{
+    border: 1px solid black;
+    display: inline-block;
+
+
+}
+.bar_menu
+{
+    border: 1px solid black;
+    margin : -1px -1px 0 0px;
+    height: 20px;
+    display: flex;
+    justify-content: space-around;
 }
 
 .pairGameContainer td:hover
