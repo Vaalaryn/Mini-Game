@@ -1,12 +1,14 @@
 $(() => {
     let socket = io();
     socket.emit('login', username);
-    function loadGame(gameName){
-        socket.emit('choose page', {page: gameName});
-    }
 
-    socket.on('load page', () => {
-        
+
+    $('.chooseGame').click( function (e) {
+        socket.emit('choose page', this.getAttribute('data-game'));
+    });
+
+    socket.on('load page', (gamePage) => {
+        document.getElementById('game').innerHTML = gamePage;
     });
 
     $('#inputMessage').keyup( (e) => {
