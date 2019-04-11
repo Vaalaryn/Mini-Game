@@ -8,6 +8,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const path = require('path');
 const bcrypt = require('bcrypt-nodejs');
+const fs = require('fs');
 
 const app = express();
 const server = require('http').createServer(app);
@@ -174,6 +175,14 @@ io.on('connection', (socket) => {
             numUsers: numUsers
         });
         io.emit('new user', {user: user, numUsers: numUsers});
+    });
+
+    socket.on('choose page', (pageName) => {
+        fs.readFile('views/' + pageName + '.html',(err, data) => {
+            if (err) throw err;
+            socket.emit('load page', data.toString());
+        });
+
     });
 
     socket.on('message sent', (data) => {
