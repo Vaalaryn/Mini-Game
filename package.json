@@ -1,25 +1,26 @@
 {
-  "name": "game",
+  "name": "server",
   "version": "1.0.0",
-  "description": "Mini-Game",
+  "description": "",
   "main": "index.js",
-  "dependencies": {
-    "ejs": "^2.6.1",
-    "express": "^4.15.2",
-    "socket.io": "^2.2.0"
-  },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:server": "nodemon --ignore sessions/ server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vaalaryn/Mini-Game.git"
-  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Vaalaryn/Mini-Game/issues"
-  },
-  "homepage": "https://github.com/Vaalaryn/Mini-Game#readme"
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "session-file-store": "^1.2.0",
+    "socket.io": "^2.2.0",
+    "uuid": "^3.3.2"
+  }
 }

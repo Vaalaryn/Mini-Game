@@ -1,82 +1,169 @@
-// Setup basic express server
-var express = require('express');
-var app = express();
-var path = require('path');
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
-var port = process.env.PORT || 80;
+const express = require('express');
+const session = require('express-session');
+const axios = require('axios');
+const uuid = require('uuid');
+const FileStore = require('session-file-store')(session);
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const path = require('path');
+const bcrypt = require('bcrypt-nodejs');
+
+const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+
+const port = process.env.PORT || 80;
+let sessionUsers = [];
+
+passport.use(new LocalStrategy(
+    {usernameField: 'username'},
+    (username, password, done) => {
+        axios.get(`http://localhost:5000/users?username=${username}`)
+            .then(res => {
+                const user = res.data[0];
+                if (!user) {
+                    return done(null, false, {message: 'Invalid username.\n'});
+                }
+                if (!bcrypt.compareSync(password, user.password)) {
+                    return done(null, false, {message: 'Invalid password.\n'});
+                }
+
+                return done(null, user);
+            })
+            .catch(error => done(error));
+    }
+));
+
+// tell passport how to serialize the user
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    axios.get(`http://localhost:5000/users/${id}`)
+        .then(res => done(null, res.data))
+        .catch(error => done(error, false))
+});
+
+//donne au client acces au dossier public/
+app.use(express.static(path.join(__dirname, 'public')));
+//pour parser et récuperer les info
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(session({
+    genid: () => {
+        return uuid() // use UUIDs for session IDs
+    },
+    store: new FileStore(),
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.set('view engine', 'ejs');
+
+//Routing
+app.get('/', (req, res) => {
+    res.render("inscription", {notErrorMessage: "", errorMessage: ""});
+});
+
+app.post('/', (req, res) => {
+    let POST = req.body;
+    if (POST.password && POST.cpassword && POST.email && POST.username) {
+        axios.get(`http://localhost:5000/users?username=${POST.username}`)
+            .then((response) => {
+                if (response.data.length === 0) {
+                    if (POST.password === POST.cpassword) {
+                        let hash = bcrypt.hashSync(POST.password);
+                        axios.post('http://localhost:5000/users', {
+                            username: POST.username,
+                            email: POST.email,
+                            password: hash,
+                            xp: 0
+                        });
+                        res.render('inscription',{notErrorMessage: 'inscription reussi', errorMessage: "",});
+                    } else {
+                        res.render('inscription',{notErrorMessage: "", errorMessage: 'mot de passe est différent'});
+                    }
+                } else {
+                    res.render('inscription',{notErrorMessage: "", errorMessage: 'ce pseudo est déjà pris'});
+                }
+            });
+    } else {
+        res.render('inscription',{notErrorMessage: "", errorMessage: 'il y a des champs vide'});
+    }
+});
+
+app.get('/login', (req, res) => {
+    res.render("login");
+});
+
+app.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (info) {
+            return res.send(info.message)
+        }
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.render('/login',{msg: "mauvais username"});
+        }
+        req.login(user, (err) => {
+            if (err) {
+                return next(err);
+            }
+            req.session.passport.username = user.username;
+            return res.redirect('/chat');
+        })
+    })(req, res, next);
+});
+
+app.get('/chat', (req, res) => {
+    if (req.session.passport !== undefined) {
+        if (req.session.passport.username && req.session.passport.user) {
+            axios.get(`http://localhost:5000/users/${req.session.passport.user}`)
+                .then((response) => {
+                        if (response.data.username !== req.session.passport.username) {
+                            res.redirect('/login');
+                        } else {
+                            res.render('main', {username: req.session.passport.username});
+                        }
+                    }
+                )
+        }else {
+            res.redirect('/login');
+        }
+    }else {
+        res.redirect('/login');
+    }
+});
+
+app.get('/disconnect', (req, res) => {
+    req.session.destroy();
+    res.redirect('/login');
+});
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
 });
 
-// Routing
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.set('view engine', 'ejs');
-
-app.get('/', (req, res) => {
-   res.render('index');
-});
-
-// Chatroom
-
-var numUsers = 0;
-
 io.on('connection', (socket) => {
-    var addedUser = false;
+   socket.on('login', (user) => {
+       sessionUsers[user]=socket.id;
+       io.emit('new user', user);
+   });
 
-    // when the client emits 'new message', this listens and executes
-    socket.on('new message', (data) => {
-        // we tell the client to execute 'new message'
-        socket.broadcast.emit('new message', {
-            username: socket.username,
-            message: data
-        });
-    });
+   socket.on('message sent', (data) => {
+       io.emit('new message', data);
+   });
 
-    // when the client emits 'add user', this listens and executes
-    socket.on('add user', (username) => {
-        if (addedUser) return;
-
-        // we store the username in the socket session for this client
-        socket.username = username;
-        ++numUsers;
-        addedUser = true;
-        socket.emit('login', {
-            numUsers: numUsers
-        });
-        // echo globally (all clients) that a person has connected
-        socket.broadcast.emit('user joined', {
-            username: socket.username,
-            numUsers: numUsers
-        });
-    });
-
-    // when the client emits 'typing', we broadcast it to others
-    socket.on('typing', () => {
-        socket.broadcast.emit('typing', {
-            username: socket.username
-        });
-    });
-
-    // when the client emits 'stop typing', we broadcast it to others
-    socket.on('stop typing', () => {
-        socket.broadcast.emit('stop typing', {
-            username: socket.username
-        });
-    });
-
-    // when the user disconnects.. perform this
-    socket.on('disconnect', () => {
-        if (addedUser) {
-            --numUsers;
-
-            // echo globally that this client has left
-            socket.broadcast.emit('user left', {
-                username: socket.username,
-                numUsers: numUsers
-            });
-        }
-    });
+   socket.on('private sent', (data) => {
+       io.to(sessionUsers[data.to]).emit('new private', data);
+       socket.emit('new private', data);
+   });
 });
