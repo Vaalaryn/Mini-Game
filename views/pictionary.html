@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Socket.IO whiteboard</title>
+    <link rel="stylesheet" href="../../Test%20Node/public/pictionary.css">
+    <link rel="stylesheet" href="../../Test%20Node/public/index.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<form id="connexion">
+        <div class="form-group">
+            <label for="username">Pseudo</label>
+            <input type="text" class="form-control" id="username" aria-describedby="emailHelp" placeholder="Entez votre pseudo">
+            <small  class="form-text text-muted">Votre pseudo sera affiché dans le chat</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Entrer dans le salon</button>
+</form>
+<div id="hud">
+    <div class="bar-menu"></div>
+    <div class="game">
+        <div class="gameContainer">
+            <div class="pictionary">
+                <canvas class="whiteboard"></canvas>
+            </div>
+            <div class="colors">
+                <div class="color black"></div>
+                <div class="color red"></div>
+                <div class="color green"></div>
+                <div class="color blue"></div>
+                <div class="color yellow"></div>
+            </div>
+        </div>
+        <div class="chat">
+            <ul id="chatArea">
+            </ul>
+            <input type="text" id="messageInput" placeholder="Plarlez ici">
+
+        </div>
+    </div>
+</div>
+<script src="socket.io/socket.io.js"></script>
+<script src="pictionary.js"></script>
+
+</body>
+</html>

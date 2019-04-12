@@ -8,8 +8,11 @@ $(() => {
     });
 
     socket.on('load page', (gamePage) => {
-        document.getElementById('game').innerHTML = gamePage;
-        startMemo();
+        document.getElementById('game').innerHTML = gamePage.main;
+        if (gamePage.name === 'memo')
+            startMemo();
+        if (gamePage.name === 'pui4')
+            startPui4();
     });
 
     $('#inputMessage').keyup( (e) => {
