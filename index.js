@@ -69,15 +69,15 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 
 //Routing
-app.get('/', (req, res) => {
+app.get('/inscription', (req, res) => {
     if (req.session.passport === undefined) {
         res.render("inscription", {notErrorMessage: "", errorMessage: ""});
     } else {
-        res.redirect('/chat');
+        res.redirect('/main');
     }
 });
 
-app.post('/', (req, res) => {
+app.post('/inscription', (req, res) => {
     let POST = req.body;
     if (POST.password && POST.cpassword && POST.email && POST.username) {
         axios.get(`http://localhost:5000/users?username=${POST.username}`)
@@ -91,7 +91,7 @@ app.post('/', (req, res) => {
                             password: hash,
                             xp: 0
                         });
-                        res.render('inscription', {notErrorMessage: 'inscription reussi', errorMessage: "",});
+                        res.render('inscription', {notErrorMessage: 'inscription réussie', errorMessage: "",});
                     } else {
                         res.render('inscription', {notErrorMessage: "", errorMessage: 'mot de passe est différent'});
                     }
@@ -100,19 +100,19 @@ app.post('/', (req, res) => {
                 }
             });
     } else {
-        res.render('inscription', {notErrorMessage: "", errorMessage: 'il y a des champs vide'});
+        res.render('inscription', {notErrorMessage: "", errorMessage: 'il y à un ou plusieurs champs vides'});
     }
 });
 
-app.get('/login', (req, res) => {
+app.get('/', (req, res) => {
     if (req.session.passport === undefined) {
         res.render("login");
     } else {
-        res.redirect('/chat');
+        res.redirect('/main');
     }
 });
 
-app.post('/login', (req, res, next) => {
+app.post('/', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (info) {
             return res.send(info.message)
@@ -121,41 +121,41 @@ app.post('/login', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.render('/login', {msg: "mauvais username"});
+            return res.render('/', {msg: "mauvais username"});
         }
         req.login(user, (err) => {
             if (err) {
                 return next(err);
             }
             req.session.passport.username = user.username;
-            return res.redirect('/chat');
+            return res.redirect('/main');
         })
     })(req, res, next);
 });
 
-app.get('/chat', (req, res) => {
+app.get('/main', (req, res) => {
     if (req.session.passport !== undefined) {
         if (req.session.passport.username && req.session.passport.user) {
             axios.get(`http://localhost:5000/users/${req.session.passport.user}`)
                 .then((response) => {
                         if (response.data.username !== req.session.passport.username) {
-                            res.redirect('/login');
+                            res.redirect('/');
                         } else {
                             res.render('main', {username: req.session.passport.username});
                         }
                     }
                 )
         } else {
-            res.redirect('/login');
+            res.redirect('/');
         }
     } else {
-        res.redirect('/login');
+        res.redirect('/');
     }
 });
 
 app.get('/disconnect', (req, res) => {
     req.session.destroy();
-    res.redirect('/login');
+    res.redirect('/');
 });
 
 server.listen(port, () => {
