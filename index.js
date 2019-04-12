@@ -14,6 +14,8 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+const route = require("./route/route.js");
+
 const port = process.env.PORT || 80;
 let sessionUsers = [];
 let numUsers = 0;
@@ -68,7 +70,6 @@ app.use(passport.session());
 
 app.set('view engine', 'ejs');
 
-//Routing
 app.get('/inscription', (req, res) => {
     if (req.session.passport === undefined) {
         res.render("inscription", {notErrorMessage: "", errorMessage: ""});
@@ -93,7 +94,10 @@ app.post('/inscription', (req, res) => {
                         });
                         res.render('inscription', {notErrorMessage: 'inscription réussie', errorMessage: "",});
                     } else {
-                        res.render('inscription', {notErrorMessage: "", errorMessage: 'mot de passe est différent'});
+                        res.render('inscription', {
+                            notErrorMessage: "",
+                            errorMessage: 'mot de passe est différent'
+                        });
                     }
                 } else {
                     res.render('inscription', {notErrorMessage: "", errorMessage: 'ce pseudo est déjà pris'});
