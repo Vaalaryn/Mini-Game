@@ -184,7 +184,7 @@ io.on('connection', (socket) => {
     socket.on('choose page', (pageName) => {
         fs.readFile('views/' + pageName + '.html',(err, data) => {
             if (err) throw err;
-            socket.emit('load page', data.toString());
+            socket.emit('load page', {main: data.toString(), name: pageName});
         });
 
     });
